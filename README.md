@@ -1,71 +1,65 @@
-# Star Wars Resistence Social Network
+# Pandemic Combat Aid System
 
 ## Descrição do problema
 
-O império continua sua luta incessante de dominar a galáxia, tentando ao máximo expandir seu território e eliminar os rebeldes.
+Quando o mundo é atingido por uma pandemia sem remédio imediato, além das habilidades dos profissionais de saúde, é preciso ter um bom sistema de informações para ajudar nas tomadas de decisões, visando amenizar ao máximo seus impactos.
 
-Você, como um soldado da resistência, foi designado para desenvolver um sistema para compartilhar recursos entre o rebeldes.
+Assim, ainda que não seja da área de saúde, você pode ajudar no combate. Para isso,  foi designado para desenvolver um sistema que irá coletar informações de todo país, organizá-las e prover informações com base nelas.
 
 ## Requisitos
 
-Você irá desenvolver uma **API REST** (sim, nós levamos a arquitetura da aplicação a sério mesmo no meio de uma guerra), ao qual irá armazenar informação sobre os rebeldes, bem como os recursos que eles possuem.
+Você irá desenvolver uma **API RESTFul** (a ideia é que facilmente outros sistemas consigam se integrar para prover e obter dados), ao qual irá armazenar informação sobre os hospitais, seus recursos (pessoais e materiais), pacientes em atendimento, etc, ajudando no intercâmbio de recursos.
 
-* **Adicionar rebeldes**
+* **Adicionar hospitais**
 
-  Um rebelde deve ter um *nome*, *idade*, *gênero*, *localização*(latitude, longitude e nome, na galáxia, da base ao qual faz parte).
+  Um hospotal deve ter um *nome*, *endereço*, *cnpj*, *localização* (latitude, longitude, etc.).
 
-  Um rebelde também possui um inventário que deverá ser passado na requisição com os recursos em sua posse.
+  Ao adicionar o hospital, junto deve ser adicionado seus recursos atuais bem como seu percentual de ocupação.
 
-* **Atualizar localização do rebelde**
+* **Atualizar percentual de ocupação de um hospital**
 
-  Um rebelde deve possuir a capacidade de reportar sua última localização, armazenando a nova latitude/longitude/nome (não é necessário rastrear as localizações, apenas sobrescrever a última é o suficiente).
+  Um hospital deve poder reportar seu percentual de ocupação a todo instante, de forma que isso possa ser usado no processo de intercâmbio de recursos.
 
-* **Reportar o rebelde como um traidor**
+* **Hospitais não podem Adicionar/Remover recursos**
 
-  Eventualmente algum rebelde irá trair a resistência e se aliar ao império. Quando isso acontecer, nós precisamos informar que o rebelde é um traidor.
+  Os recursos dos hospitais só podem ser alterados via intercâmbio. Aquisição de recursos avulso será feita em outra API, pois requer um processo específico.
 
-  Um traidor não pode negociar os recursos com os demais rebeldes, não pode manipular seu inventário, nem ser exibido em relatórios.
+* **Intercâmbio de recursos**
 
-  **Um rebelde é marcado como traidor quando, ao menos, três outros rebeldes reportarem a traição.**
+  Os hospitais poderão trocar recursos entre eles.
 
-  Uma vez marcado como traidor, os itens do inventário se tornam inacessíveis (eles não podem ser negociados com os demais).
+  Para isso, eles devem respeitar a tabela de valores abaixo, onde o valor do recurso é descrito em termo de pontos.
 
-* **Rebeldes não podem Adicionar/Remover itens do seu inventário**
+  Ambos os hospitais deverão oferecer a mesma quantidade de pontos. Por exemplo, 2 respirador e 1 enfermeiro (2 x 5 + 1 x 3), valem o mesmo que 1 médico e 1 ambulância (1 x 3 + 1 x 10).
+  Esta regra poderá ser quebrada caso algum hospital esteja com ocupação maior que 90%, onde ele poderá oferecer menos recursos que outro hospital no intercâmbio.
 
-  Seus pertences devem ser declarados quando eles são registrados no sistema. Após isso eles só poderão mudar seu inventário através de negociação com os outros rebeldes.
+  A negociação em si não será armazenada, mas os itens deverão ser transferidos de um hospital a outro.
 
-* **Negociar itens**
-
-  Os rebeldes poderão negociar itens entre eles.
-
-  Para isso, eles devem respeitar a tabela de preços abaixo, onde o valor do item é descrito em termo de pontos.
-
-  Ambos os lados deverão oferecer a mesma quantidade de pontos. Por exemplo, 1 arma e 1 água (1 x 4 + 1 x 2) valem 6 comidas (6 x 1) ou 2 munições (2 x 3).
-
-  A negociação em si não será armazenada, mas os itens deverão ser transferidos de um rebelde a outro.
-
-  | Item      | Pontos   |
-  |-----------|----------|
-  | 1 Arma    | 4 pontos |
-  | 1 Munição | 3 pontos |
-  | 1 Água    | 2 pontos |
-  | 1 Comida  | 1 ponto  |
+  | Item         | Pontos    |
+  |------------- |-----------|
+  | 1 Médico     |  3 pontos |
+  | 1 Enfermeiro |  3 pontos |
+  | 1 Respirador |  5 pontos |
+  | 1 Tomógrafo  | 12 ponto  |
+  | 1 Ambulância | 10 ponto  |
 
 * **Relatórios**
 
   A API deve oferecer os seguintes relatórios:
 
-  1. Porcentagem de traidores.
-  2. Porcentagem de rebeldes.
-  3. Quantidade média de cada tipo de recurso por rebelde (Ex: 2 armas por rebelde).
+  1. Porcentagem de hospitais com ocupação maior que 90%.
+  2. Porcentagem de hospitais com ocupação menor que 90%.
+  3. Quantidade média de cada tipo de recurso por hospital (Ex: 2 tomógrafos por hospital).
   4. Pontos perdidos devido a traidores.
+  5. Hospital em super-lotação (ocupação maior que 90%) a mais tempo.
+  6. Hospital em abaixo de super-lotação (ocupação maior que 90%) a mais tempo.
 
 # Notas
 
 1. Deverá ser utilizado Java, Spring boot, Spring Data, Hibernate (pode ser usado o banco de dados H2) e como gerenciador de dependência Maven ou Gradle.
 2. Não será necessário autenticação.
-3. Nós ainda nos preocupamos com uma programação adequada (código limpo) e técnicas de arquitetura, você deve demonstrar que é um digno soldado da resistência através das suas habilidades.
-4. Não esqueça de minimamente documentar os endpoints da sua API e como usa-los.
+3. Nós ainda nos preocupamos com uma programação adequada (código limpo) e técnicas de arquitetura, você deve demonstrar isso mesmo em meio a uma pandemia.
+4. Não esqueça de documentar a sua API.
 5. Sua API deve estar minimamente coberta por testes (Unitários e/ou integração).
-6. Da descrição acima você pode escrever uma solução básica ou adicionar requisitos não descritos. Use seu tempo com sabedoria; Uma solução ótima e definitiva pode levar muito tempo para ser efetiva na guerra, então você deve trazer a melhor solução possível, que leve o mínimo de tempo, mas que ainda seja capaz de demonstrar suas habilidades e provar que você é um soldado valioso para a resistência.
+6. Da descrição acima você pode escrever uma solução básica ou adicionar requisitos não descritos. Use seu tempo com sabedoria; Uma solução ótima e definitiva pode levar muito tempo para ser efetiva, então você deve trazer a melhor solução possível, que leve o mínimo de tempo, mas que ainda seja capaz de demonstrar suas habilidades.
 7. Comente qualquer dúvida e cada decisão tomada.
