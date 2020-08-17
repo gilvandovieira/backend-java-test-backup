@@ -6,9 +6,9 @@ Quando o mundo é atingido por uma pandemia sem remédio imediato, além das hab
 
 Assim, ainda que não seja da área de saúde, você pode ajudar no combate. Para isso,  foi designado para desenvolver um sistema que irá coletar informações de todo país, organizá-las e prover informações com base nelas.
 
-## Requisitos
+## Requisitos (MVP 1)
 
-Você irá desenvolver uma **API RESTFul** (a ideia é que facilmente outros sistemas consigam se integrar para prover e obter dados), ao qual irá armazenar informação sobre os hospitais, seus recursos (pessoais e materiais), pacientes em atendimento, etc, ajudando no intercâmbio de recursos.
+Você irá desenvolver uma **API RESTFul** (a ideia é que facilmente outros sistemas consigam se integrar para prover e obter dados), ao qual irá armazenar informação sobre os hospitais, seus recursos (pessoais e materiais), pacientes em atendimento (versões futuras), etc, ajudando no intercâmbio de recursos.
 
 * **Adicionar hospitais**
 
@@ -28,12 +28,12 @@ Você irá desenvolver uma **API RESTFul** (a ideia é que facilmente outros sis
 
   Os hospitais poderão trocar recursos entre eles.
 
-  Para isso, eles devem respeitar a tabela de valores abaixo, onde o valor do recurso é descrito em termo de pontos.
+  Para isso, eles devem respeitar a tabela de valores abaixo, onde o valor do recurso é descrito em termos de pontos.
 
-  Ambos os hospitais deverão oferecer a mesma quantidade de pontos. Por exemplo, 2 respirador e 1 enfermeiro (2 x 5 + 1 x 3), valem o mesmo que 1 médico e 1 ambulância (1 x 3 + 1 x 10).
+  Ambos os hospitais deverão oferecer a mesma quantidade de pontos. Por exemplo, 2 respiradores e 1 enfermeiro (2 x 5 + 1 x 3 = 13), valem o mesmo que 1 médico e 1 ambulância (1 x 3 + 1 x 10 = 13).
   Esta regra poderá ser quebrada caso algum hospital esteja com ocupação maior que 90%, onde ele poderá oferecer menos recursos que outro hospital no intercâmbio.
 
-  A negociação em si não será armazenada, mas os itens deverão ser transferidos de um hospital a outro.
+  Além de armazenar a negociação por questões de histórico, os itens deverão ser transferidos de um hospital a outro.
 
   | Item         | Pontos    |
   |------------- |-----------|
@@ -53,6 +53,7 @@ Você irá desenvolver uma **API RESTFul** (a ideia é que facilmente outros sis
   4. Pontos perdidos devido a traidores.
   5. Hospital em super-lotação (ocupação maior que 90%) a mais tempo.
   6. Hospital em abaixo de super-lotação (ocupação maior que 90%) a mais tempo.
+  7. Histórico de negociação.
 
 # Notas
 
