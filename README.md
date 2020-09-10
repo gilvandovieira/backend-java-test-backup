@@ -50,10 +50,9 @@ Você irá desenvolver uma **API RESTFul** (a ideia é que facilmente outros sis
   1. Porcentagem de hospitais com ocupação maior que 90%.
   2. Porcentagem de hospitais com ocupação menor que 90%.
   3. Quantidade média de cada tipo de recurso por hospital (Ex: 2 tomógrafos por hospital).
-  4. Pontos perdidos devido a traidores.
-  5. Hospital em super-lotação (ocupação maior que 90%) a mais tempo.
-  6. Hospital em abaixo de super-lotação (ocupação maior que 90%) a mais tempo.
-  7. Histórico de negociação.
+  4. Hospital em super-lotação (ocupação maior que 90%) a mais tempo.
+  5. Hospital em abaixo de super-lotação (ocupação maior que 90%) a mais tempo.
+  6. Histórico de negociação.
 
 # Notas
 
