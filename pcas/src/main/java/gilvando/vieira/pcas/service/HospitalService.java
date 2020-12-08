@@ -70,5 +70,13 @@ public class HospitalService {
         return this.hospitalRepository.save(hospital);
 
     }
-
+    /**
+     * Adiciona novo hospital ao Banco de dados
+     * @param hospital
+     * @return Retorna entidade hospital
+     */
+    public Hospital salvaHospital(Hospital hospital) {
+       // hospital.setId(null);
+        return this.hospitalRepository.save(hospital);
+    }
 }
