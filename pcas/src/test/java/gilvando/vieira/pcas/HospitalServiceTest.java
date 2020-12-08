@@ -14,7 +14,7 @@ import gilvando.vieira.pcas.repository.HospitalRepository;
 import gilvando.vieira.pcas.service.HospitalService;
 
 @ExtendWith(MockitoExtension.class)
-public class ServicesTests {
+public class HospitalServiceTest {
 
     @Mock
     HospitalRepository hospitalRepository;
@@ -24,6 +24,7 @@ public class ServicesTests {
     @BeforeEach
     public void setUp() {
         hospitalService = new HospitalService(hospitalRepository);
+
     }
 
     @Test

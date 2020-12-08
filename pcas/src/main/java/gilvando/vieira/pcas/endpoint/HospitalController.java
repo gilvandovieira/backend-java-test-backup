@@ -32,7 +32,7 @@ public class HospitalController {
         Hospital hospital = this.hospitalService.hospitalPorId(id);
 
         if (hospital == null) {
-            throw new HospitalNaoEncontrado();
+            throw new HospitalNaoEncontradoException();
         }
 
         return hospital;

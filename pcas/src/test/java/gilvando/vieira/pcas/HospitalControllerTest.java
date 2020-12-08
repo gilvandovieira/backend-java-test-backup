@@ -21,7 +21,7 @@ import gilvando.vieira.pcas.entity.Hospital;
 import gilvando.vieira.pcas.service.HospitalService;
 
 @WebMvcTest
-public class ControllersTests {
+public class HospitalControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
