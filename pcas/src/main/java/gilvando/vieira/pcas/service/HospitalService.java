@@ -1,11 +1,15 @@
 package gilvando.vieira.pcas.service;
 
 import java.util.List;
+import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import gilvando.vieira.pcas.endpoint.HospitalNaoEncontradoException;
 import gilvando.vieira.pcas.entity.Hospital;
+import gilvando.vieira.pcas.entity.Recurso;
+import gilvando.vieira.pcas.entity.RecursoExcedidoException;
 import gilvando.vieira.pcas.repository.HospitalRepository;
 
 @Service
@@ -13,6 +17,7 @@ public class HospitalService {
 
     private HospitalRepository hospitalRepository;
 
+    @Autowired
     public HospitalService(HospitalRepository hospitalRepository) {
         this.hospitalRepository = hospitalRepository;
     }
@@ -23,11 +28,9 @@ public class HospitalService {
     }
 
     public Hospital hospitalPorId(Long id) {
-        Hospital hospital = this.hospitalRepository.findById(Hospital.builder().id(id).build());
+        Optional<Hospital> optHospital = this.hospitalRepository.findById(id);
 
-        if (hospital == null) {
-            throw new HospitalNaoEncontradoException();
-        }
+        Hospital hospital = optHospital.orElseThrow((() -> new HospitalNaoEncontradoException()));
 
         return hospital;
 
@@ -41,14 +44,14 @@ public class HospitalService {
      */
     public Hospital alterarNrDePacientes(Long id, Long pacientes) {
 
-        Hospital hospital = this.hospitalRepository.findById(Hospital.builder().id(id).build());
+        Hospital hospital = this.hospitalPorId(id);
 
         if (hospital == null) {
-            throw new HospitalNaoEncontradoException();
+            throw new HospitalNaoEncontradoException("Hospital não encontrado. Não foi possível alterar número de pacientes.");
         }
 
         hospital.setPacientes(pacientes);
-        return this.hospitalRepository.save(hospital);
+        return this.salvaHospital(hospital);
 
     }
 
@@ -60,14 +63,14 @@ public class HospitalService {
      */
     public Hospital alterarCapacidade(Long id, Long capacidade) {
 
-        Hospital hospital = this.hospitalRepository.findById(Hospital.builder().id(id).build());
+        Hospital hospital = this.hospitalPorId(id);
 
         if (hospital == null) {
             throw new HospitalNaoEncontradoException();
         }
 
         hospital.setCapacidade(capacidade);
-        return this.hospitalRepository.save(hospital);
+        return this.salvaHospital(hospital);
 
     }
     /**
@@ -78,5 +81,44 @@ public class HospitalService {
     public Hospital salvaHospital(Hospital hospital) {
        // hospital.setId(null);
         return this.hospitalRepository.save(hospital);
+    }
+
+    public boolean realizaTransacaoEntreHospitais(Long h1, Long h2, Recurso aReceber, Recurso aEnviar) {
+
+        Hospital hospitalAReceber = this.hospitalPorId(h1);
+        Hospital hospitalAEnviar = this.hospitalPorId(h2);
+
+        if (hospitalAReceber.lotacao() >= 0.9) {
+
+            try {
+                hospitalAEnviar.getRecursos().subtrai(aEnviar);
+            } catch (RecursoExcedidoException e) {
+                e.printStackTrace();
+                return false;
+            }
+
+            hospitalAReceber.getRecursos().soma(aReceber);
+
+            this.hospitalRepository.save(hospitalAEnviar);
+            this.hospitalRepository.save(hospitalAReceber);
+            return true;
+        }
+
+        if (aReceber.equivalente(aEnviar)) {
+            try {
+                hospitalAEnviar.getRecursos().subtrai(aEnviar);
+            } catch (RecursoExcedidoException e) {
+                e.printStackTrace();
+                return false;
+            }
+            hospitalAReceber.getRecursos().soma(aReceber);
+
+            this.hospitalRepository.save(hospitalAEnviar);
+            this.hospitalRepository.save(hospitalAReceber);
+            return true;
+        }
+
+        return false;
+
     }
 }
