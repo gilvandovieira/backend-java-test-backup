@@ -2,8 +2,11 @@ package gilvando.vieira.pcas;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+import gilvando.vieira.pcas.entity.HospitalLog;
+import gilvando.vieira.pcas.repository.HospitalLogRepository;
 import org.junit.jupiter.api.Test;
 
 //import org.junit.Test;
@@ -23,6 +26,9 @@ public class RepositoryTests {
 
     @Autowired
     private HospitalRepository hospitalRepository;
+
+    @Autowired
+    private HospitalLogRepository hospitalLogRepository;
 
     @Autowired
     TestEntityManager testEntityManager;
@@ -52,6 +58,17 @@ public class RepositoryTests {
 
         assertThat(hospitais.size()).isEqualTo(1);
         assertThat(hospitais.get(0).getNome()).isEqualTo("Hospital Guadalupe");
+    }
+
+    @Test
+    public void retornaTodosLogs(){
+        Hospital hospital = testEntityManager.persistAndFlush(Hospital.builder().build());
+        HospitalLog hospitalLog = testEntityManager.persistAndFlush(HospitalLog.builder().dataHora(LocalDateTime.now()).hospital(Hospital.builder().id(1l).build()).build());
+
+        List<HospitalLog> hospitalLogs = hospitalLogRepository.findAll();
+
+        assertThat(hospitalLogs.size()).isEqualTo(1);
+        assertThat(hospitalLogs.get(0)).isEqualTo(hospitalLog);
     }
 
 }

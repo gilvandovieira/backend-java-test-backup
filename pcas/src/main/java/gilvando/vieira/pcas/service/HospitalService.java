@@ -1,25 +1,26 @@
 package gilvando.vieira.pcas.service;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import gilvando.vieira.pcas.endpoint.HospitalNaoEncontradoException;
 import gilvando.vieira.pcas.entity.Hospital;
 import gilvando.vieira.pcas.entity.Recurso;
 import gilvando.vieira.pcas.entity.RecursoExcedidoException;
+import gilvando.vieira.pcas.repository.HospitalLogRepository;
 import gilvando.vieira.pcas.repository.HospitalRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
 
 @Service
 public class HospitalService {
 
     private HospitalRepository hospitalRepository;
+    private HospitalLogRepository hospitalLogRepository;
 
     @Autowired
-    public HospitalService(HospitalRepository hospitalRepository) {
+    public HospitalService(HospitalRepository hospitalRepository,HospitalLogRepository hospitalLogRepository) {
         this.hospitalRepository = hospitalRepository;
+        this.hospitalLogRepository = hospitalLogRepository;
     }
 
     public List<Hospital> listaHospitais() {
@@ -37,7 +38,6 @@ public class HospitalService {
     }
 
     /**
-     * 
      * @param id        identificador do hospital
      * @param pacientes altera o total de pacientes no hospital
      * @return hospital atualizado
@@ -56,7 +56,6 @@ public class HospitalService {
     }
 
     /**
-     * 
      * @param id         identificador do hospital
      * @param capacidade capacidade total do hospital
      * @return hospital atualizado
@@ -73,13 +72,15 @@ public class HospitalService {
         return this.salvaHospital(hospital);
 
     }
+
     /**
      * Adiciona novo hospital ao Banco de dados
+     *
      * @param hospital
      * @return Retorna entidade hospital
      */
     public Hospital salvaHospital(Hospital hospital) {
-       // hospital.setId(null);
+        // hospital.setId(null);
         return this.hospitalRepository.save(hospital);
     }
 
@@ -99,8 +100,8 @@ public class HospitalService {
 
             hospitalAReceber.getRecursos().soma(aReceber);
 
-            this.hospitalRepository.save(hospitalAEnviar);
-            this.hospitalRepository.save(hospitalAReceber);
+            this.salvaHospital(hospitalAEnviar);
+            this.salvaHospital(hospitalAReceber);
             return true;
         }
 
@@ -113,12 +114,54 @@ public class HospitalService {
             }
             hospitalAReceber.getRecursos().soma(aReceber);
 
-            this.hospitalRepository.save(hospitalAEnviar);
-            this.hospitalRepository.save(hospitalAReceber);
+            this.salvaHospital(hospitalAEnviar);
+            this.salvaHospital(hospitalAReceber);
             return true;
         }
 
         return false;
 
+    }
+
+    public Double porcentagemDeHospitaisComOcupacaoMaiorQue90Porcento() {
+        List<Hospital> hospitais = this.listaHospitais();
+        Long count = hospitais.stream().count();
+        Long nrHospitaisComMaisDe90Porcento = hospitais.stream().filter((hospital -> (hospital.getPacientes().doubleValue() / hospital.getCapacidade().doubleValue()) >= 0.9d)).count();
+        //long nrHospitaisComMenosDe90Porcento = hospitais.stream().filter((hospital -> (hospital.getPacientes() / hospital.getCapacidade()) < 0.9)).count();
+
+        return Double.valueOf(nrHospitaisComMaisDe90Porcento.doubleValue() / count.doubleValue());
+    }
+
+    public Double porcentagemDeHospitaisComOcupacaoMenorQue90Porcento() {
+        List<Hospital> hospitais = this.listaHospitais();
+        Long count = hospitais.stream().count();
+
+        Long nrHospitaisComMenosDe90Porcento = hospitais.stream().filter((hospital -> (hospital.getPacientes().doubleValue() / hospital.getCapacidade().doubleValue()) < 0.9)).count();
+
+        return nrHospitaisComMenosDe90Porcento.doubleValue() / count.doubleValue();
+    }
+
+    public Map<String, Double> mediaDeEquipamentos(){
+        List<Hospital> hospitais = this.listaHospitais();
+
+        OptionalDouble optAmbulancia = hospitais.stream().mapToLong(value -> value.getRecursos().getAmbulancia()).average();
+        OptionalDouble optEnfermeiro = hospitais.stream().mapToLong(value -> value.getRecursos().getEnfermeiro()).average();
+        OptionalDouble optMedico = hospitais.stream().mapToLong(value -> value.getRecursos().getMedico()).average();
+        OptionalDouble optRespirador = hospitais.stream().mapToLong(value -> value.getRecursos().getRespirador()).average();
+        OptionalDouble optTomografo = hospitais.stream().mapToLong(value -> value.getRecursos().getTomografo()).average();
+
+        Double ambulancia = optAmbulancia.orElseThrow(() -> new RuntimeException("Não pode realizar a média de ambulancias."));
+        Double enfermeiro = optEnfermeiro.orElseThrow(() -> new RuntimeException("Não pode realizar a média de enfermeiros."));
+        Double medicos = optMedico.orElseThrow(() -> new RuntimeException("Não pode realizar a média de médicos."));
+        Double respirador = optRespirador.orElseThrow(() -> new RuntimeException("Não pode realizar a média de respiradores."));
+        Double tomografo = optTomografo.orElseThrow(() -> new RuntimeException("Não pode realizar a média de tomógrafos."));
+
+        Map<String, Double> medias = new HashMap<>();
+        medias.put("ambulancia", ambulancia);
+        medias.put("enfermeiro", enfermeiro);
+        medias.put("medicos", medicos);
+        medias.put("respirador", respirador);
+        medias.put("tomografo", tomografo);
+        return medias;
     }
 }

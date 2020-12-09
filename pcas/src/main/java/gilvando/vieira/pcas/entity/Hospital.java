@@ -1,15 +1,13 @@
 package gilvando.vieira.pcas.entity;
 
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Data
@@ -29,7 +27,13 @@ public class Hospital {
     @Embedded
     private Recurso recursos;
 
-    private Long capacidade, pacientes;
+    @Builder.Default
+    private Long capacidade = 0l;
+    @Builder.Default
+    private Long pacientes = 0l;
+
+    @OneToMany(mappedBy = "hospital")
+    private List<HospitalLog> logs;
 
     public Double lotacao() {
         return this.pacientes.doubleValue() / this.capacidade.doubleValue();

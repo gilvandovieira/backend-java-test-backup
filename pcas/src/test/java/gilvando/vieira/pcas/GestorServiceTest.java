@@ -3,6 +3,7 @@ package gilvando.vieira.pcas;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
+import gilvando.vieira.pcas.repository.HospitalLogRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,12 +21,15 @@ public class GestorServiceTest {
         @Mock
         HospitalRepository hospitalRepository;
 
+        @Mock
+        HospitalLogRepository hospitalLogRepository;
+
         private HospitalService gestorService;
         Recurso r;
 
         @BeforeEach
         public void setUp() {
-                gestorService = new HospitalService(hospitalRepository);
+                gestorService = new HospitalService(hospitalRepository,hospitalLogRepository);
                 r = Recurso.builder().medico(3l).ambulancia(3l).enfermeiro(3l).respirador(3l).tomografo(3l).build();
 
         }
