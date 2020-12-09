@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
 import gilvando.vieira.pcas.repository.HospitalLogRepository;
+import gilvando.vieira.pcas.repository.RecursoLogRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,12 +25,15 @@ public class GestorServiceTest {
         @Mock
         HospitalLogRepository hospitalLogRepository;
 
-        private HospitalService gestorService;
+        @Mock
+        RecursoLogRepository recursoLogRepository;
+
+        private HospitalService hospitalService;
         Recurso r;
 
         @BeforeEach
         public void setUp() {
-                gestorService = new HospitalService(hospitalRepository,hospitalLogRepository);
+                hospitalService = new HospitalService(hospitalRepository,hospitalLogRepository,recursoLogRepository);
                 r = Recurso.builder().medico(3l).ambulancia(3l).enfermeiro(3l).respirador(3l).tomografo(3l).build();
 
         }
@@ -42,7 +46,7 @@ public class GestorServiceTest {
                 given(hospitalRepository.findById(Hospital.builder().id(3l).build())).willReturn(
                                 Hospital.builder().id(3l).capacidade(10l).pacientes(7l).recursos(r).build());
 
-                boolean verdade = gestorService.realizaTransacaoEntreHospitais(2l, 3l,
+                boolean verdade = hospitalService.realizaTransacaoEntreHospitais(2l, 3l,
                                 Recurso.builder().ambulancia(1l).build(), Recurso.builder().respirador(2l).build());
 
                 assertThat(verdade).isTrue();
@@ -56,7 +60,7 @@ public class GestorServiceTest {
                 given(hospitalRepository.findById(Hospital.builder().id(3l).build())).willReturn(
                                 Hospital.builder().id(3l).capacidade(10l).pacientes(7l).recursos(r).build());
 
-                boolean verdade = gestorService.realizaTransacaoEntreHospitais(2l, 3l,
+                boolean verdade = hospitalService.realizaTransacaoEntreHospitais(2l, 3l,
                                 Recurso.builder().ambulancia(1l).build(), Recurso.builder().respirador(1l).build());
 
                 assertThat(verdade).isFalse();
@@ -69,7 +73,7 @@ public class GestorServiceTest {
                 given(hospitalRepository.findById(Hospital.builder().id(3l).build())).willReturn(
                                 Hospital.builder().id(3l).capacidade(10l).pacientes(7l).recursos(r).build());
 
-                boolean verdade = gestorService.realizaTransacaoEntreHospitais(1l, 3l,
+                boolean verdade = hospitalService.realizaTransacaoEntreHospitais(1l, 3l,
                                 Recurso.builder().ambulancia(1l).build(), Recurso.builder().build());
                 assertThat(verdade).isTrue();
         }

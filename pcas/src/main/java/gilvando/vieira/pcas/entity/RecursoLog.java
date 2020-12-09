@@ -8,23 +8,30 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class HospitalLog {
+@Entity
+public class RecursoLog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "hospital_id" )
-    private Hospital hospital;
+    @JoinColumn(name = "recebido_hospital")
+    private Hospital recebidoHospital;
 
-    private LocalDateTime dataHora;
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "enviado_hospital")
+    private Hospital enviadoHospital;
 
-    private Long capacidade;
-    private Long pacientes;
+
+    @Embedded
+    private Recurso total;
+
+
+    LocalDateTime dataHora;
+
 }

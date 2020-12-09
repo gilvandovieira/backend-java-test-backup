@@ -32,8 +32,14 @@ public class Hospital {
     @Builder.Default
     private Long pacientes = 0l;
 
-    @OneToMany(mappedBy = "hospital")
-    private List<HospitalLog> logs;
+    //@OneToMany(mappedBy = "hospital", fetch = FetchType.LAZY, orphanRemoval = true)
+    //private List<HospitalLog> logs;
+
+    //@OneToMany(mappedBy = "recebidoHospital", fetch = FetchType.LAZY, orphanRemoval = true)
+    //private List<RecursoLog> recursosRecebidos;
+
+    //@OneToMany(mappedBy = "enviadoHospital", fetch = FetchType.LAZY, orphanRemoval = true)
+    //private List<RecursoLog> recursosEnviados;
 
     public Double lotacao() {
         return this.pacientes.doubleValue() / this.capacidade.doubleValue();

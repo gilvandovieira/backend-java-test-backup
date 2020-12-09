@@ -1,5 +1,6 @@
 package gilvando.vieira.pcas.entity;
 
+import javax.persistence.Embeddable;
 import javax.validation.constraints.Positive;
 
 import lombok.AllArgsConstructor;
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Embeddable
 public class Recurso {
 
     public static final Long medicoPts = 3l, enfermeiroPts = 3l, respiradorPts = 5l, tomografoPts = 12l,
@@ -46,12 +48,13 @@ public class Recurso {
         return this.pontos() == recurso.pontos();
     }
 
-    public void soma(Recurso recurso) {
+    public Recurso soma(Recurso recurso) {
         this.ambulancia += recurso.ambulancia;
         this.enfermeiro += recurso.enfermeiro;
         this.medico += recurso.medico;
         this.respirador += recurso.respirador;
         this.tomografo += recurso.tomografo;
+        return this;
     }
 
     public void subtrai(Recurso recurso) throws RecursoExcedidoException {

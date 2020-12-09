@@ -22,13 +22,13 @@ public class HospitalController {
         this.hospitalService = hospitalService;
     }
 
-    @GetMapping
+    @GetMapping(produces = "application/json")
     public List<Hospital> listaHospitais() {
 
         return this.hospitalService.listaHospitais();
     }
 
-    @GetMapping(path = "/{id}")
+    @GetMapping(path = "/{id}", produces = "application/json")
     public Hospital retornaHospitalPorId(@PathVariable(name = "id") Long id) {
 
         Hospital hospital = this.hospitalService.hospitalPorId(id);

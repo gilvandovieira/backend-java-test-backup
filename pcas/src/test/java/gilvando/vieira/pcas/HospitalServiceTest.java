@@ -1,9 +1,11 @@
 package gilvando.vieira.pcas;
 
 import gilvando.vieira.pcas.entity.Hospital;
+import gilvando.vieira.pcas.entity.HospitalLog;
 import gilvando.vieira.pcas.entity.Recurso;
 import gilvando.vieira.pcas.repository.HospitalLogRepository;
 import gilvando.vieira.pcas.repository.HospitalRepository;
+import gilvando.vieira.pcas.repository.RecursoLogRepository;
 import gilvando.vieira.pcas.service.HospitalService;
 import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,11 +32,14 @@ public class HospitalServiceTest {
     @Mock
     HospitalLogRepository hospitalLogRepository;
 
+    @Mock
+    RecursoLogRepository recursoLogRepository;
+
     private HospitalService hospitalService;
 
     @BeforeEach
     public void setUp() {
-        hospitalService = new HospitalService(hospitalRepository, hospitalLogRepository);
+        hospitalService = new HospitalService(hospitalRepository, hospitalLogRepository, recursoLogRepository);
 
     }
 
@@ -53,6 +58,7 @@ public class HospitalServiceTest {
     public void alteraCapacidadeDoHospital() {
         given(hospitalRepository.findById(anyLong())).willReturn(Optional.of(Hospital.builder().build()));
         given(hospitalRepository.save(any())).willReturn(Hospital.builder().id(1l).capacidade(100l).build());
+
         Hospital hospital = hospitalService.alterarCapacidade(1l, 100l);
 
         assertThat(hospital.getId()).isEqualTo(1l);
@@ -108,8 +114,27 @@ public class HospitalServiceTest {
         given(hospitalRepository.findAll()).willReturn(List.of(Hospital.builder().recursos(Recurso.builder().ambulancia(10l).build()).build(),
                 Hospital.builder().recursos(Recurso.builder().ambulancia(20l).build()).build()));
 
-        Map<String, Double> medias = hospitalService.mediaDeEquipamentos();
+        Map<String, Double> medias = hospitalService.mediasDeRecursos();
 
         assertThat(medias.get("ambulancia")).isEqualTo(15,Offset.offset(0.0001));
+    }
+
+    @Test
+    public void registraLogDeAcontecimentos(){
+        Hospital h1 = Hospital.builder().id(1l).build();
+        given(hospitalRepository.save(any())).willReturn(h1);
+        given(hospitalRepository.findById(anyLong())).willReturn(Optional.of(h1));
+        given(hospitalLogRepository.save(any())).willReturn(HospitalLog.builder().hospital(h1).build());
+        HospitalLog hl1 = HospitalLog.builder().id(1l).hospital(h1).capacidade(100l).build();
+        given(hospitalLogRepository.findAll()).willReturn(List.of(hl1));
+
+        Hospital hospital = this.hospitalService.alterarCapacidade(1l,100l);
+
+        List<HospitalLog> logs = this.hospitalService.listaLogHospital();
+
+        assertThat(hospital.getCapacidade()).isEqualTo(100l);
+
+        assertThat(logs.size()).isEqualTo(1);
+        assertThat(logs.get(0)).isEqualTo(hl1);
     }
 }

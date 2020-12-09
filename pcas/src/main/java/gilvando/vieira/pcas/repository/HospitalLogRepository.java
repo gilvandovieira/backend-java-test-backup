@@ -10,4 +10,5 @@ import java.util.List;
 public interface HospitalLogRepository extends CrudRepository<HospitalLog, Long> {
 
     List<HospitalLog> findAll();
+    List<HospitalLog> findAllByHospital(Long hospital);
 }
