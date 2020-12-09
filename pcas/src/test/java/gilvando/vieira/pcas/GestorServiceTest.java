@@ -1,6 +1,7 @@
 package gilvando.vieira.pcas;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
 import gilvando.vieira.pcas.repository.HospitalLogRepository;
@@ -15,6 +16,8 @@ import gilvando.vieira.pcas.entity.Hospital;
 import gilvando.vieira.pcas.entity.Recurso;
 import gilvando.vieira.pcas.repository.HospitalRepository;
 import gilvando.vieira.pcas.service.HospitalService;
+
+import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 public class GestorServiceTest {
@@ -41,10 +44,10 @@ public class GestorServiceTest {
         @Test
         public void dadoHospitaisComOcupacaoNormal_TrocaDeRecursosTemQueSerEquivalente() {
 
-                given(hospitalRepository.findById(Hospital.builder().id(2l).build())).willReturn(
-                                Hospital.builder().id(2l).capacidade(10l).pacientes(8l).recursos(r).build());
-                given(hospitalRepository.findById(Hospital.builder().id(3l).build())).willReturn(
-                                Hospital.builder().id(3l).capacidade(10l).pacientes(7l).recursos(r).build());
+                given(hospitalRepository.findById(2l)).willReturn(Optional.of(
+                                Hospital.builder().id(2l).capacidade(10l).pacientes(8l).recursos(r).build()));
+                given(hospitalRepository.findById(3l)).willReturn(Optional.of(
+                                Hospital.builder().id(3l).capacidade(10l).pacientes(7l).recursos(r).build()));
 
                 boolean verdade = hospitalService.realizaTransacaoEntreHospitais(2l, 3l,
                                 Recurso.builder().ambulancia(1l).build(), Recurso.builder().respirador(2l).build());
@@ -55,10 +58,10 @@ public class GestorServiceTest {
         @Test
         public void dadoHospitaisComOcupacaoNormal_TrocaDeRecursosNaoEquivalente() {
 
-                given(hospitalRepository.findById(Hospital.builder().id(2l).build())).willReturn(
-                                Hospital.builder().id(2l).capacidade(10l).pacientes(8l).recursos(r).build());
-                given(hospitalRepository.findById(Hospital.builder().id(3l).build())).willReturn(
-                                Hospital.builder().id(3l).capacidade(10l).pacientes(7l).recursos(r).build());
+                given(hospitalRepository.findById(2l)).willReturn(Optional.of(
+                                Hospital.builder().id(2l).capacidade(10l).pacientes(8l).recursos(r).build()));
+                given(hospitalRepository.findById(3l)).willReturn(Optional.of(
+                                Hospital.builder().id(3l).capacidade(10l).pacientes(7l).recursos(r).build()));
 
                 boolean verdade = hospitalService.realizaTransacaoEntreHospitais(2l, 3l,
                                 Recurso.builder().ambulancia(1l).build(), Recurso.builder().respirador(1l).build());
@@ -68,10 +71,10 @@ public class GestorServiceTest {
 
         @Test
         public void dadoHospitalComOcupacaoPreocupante_TrocaDeRecursosNaoPrecisaSerEquivalente() {
-                given(hospitalRepository.findById(Hospital.builder().id(1l).build())).willReturn(
-                                Hospital.builder().id(1l).capacidade(10l).pacientes(9l).recursos(r).build());
-                given(hospitalRepository.findById(Hospital.builder().id(3l).build())).willReturn(
-                                Hospital.builder().id(3l).capacidade(10l).pacientes(7l).recursos(r).build());
+                given(hospitalRepository.findById(1l)).willReturn(Optional.of(
+                                Hospital.builder().id(1l).capacidade(10l).pacientes(9l).recursos(r).build()));
+                given(hospitalRepository.findById(3l)).willReturn(Optional.of(
+                                Hospital.builder().id(3l).capacidade(10l).pacientes(7l).recursos(r).build()));
 
                 boolean verdade = hospitalService.realizaTransacaoEntreHospitais(1l, 3l,
                                 Recurso.builder().ambulancia(1l).build(), Recurso.builder().build());
