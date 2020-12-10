@@ -30,86 +30,116 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebAppConfiguration
 public class HospitalControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-    @Autowired
-    private WebApplicationContext wac;
+  @Autowired private WebApplicationContext wac;
 
-    @MockBean
-    private HospitalService hospitalService;
+  @MockBean private HospitalService hospitalService;
 
-    @BeforeEach
-    public void setUp() {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
-    }
+  @BeforeEach
+  public void setUp() {
+    this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
+  }
 
-    @Test
-    public void retornaListaVazia() throws Exception {
-        when(this.hospitalService.listaHospitais()).thenReturn(new LinkedList<Hospital>());
+  @Test
+  public void retornaListaVazia() throws Exception {
+    when(this.hospitalService.listaHospitais()).thenReturn(new LinkedList<Hospital>());
 
-        this.mockMvc.perform(get("/hospitais")).andDo(print()).andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE));
-    }
+    this.mockMvc
+        .perform(get("/hospitais"))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE));
+  }
 
-    @Test
-    public void retornaUmResultado_quandoEstaArmazenado() throws Exception {
-        when(this.hospitalService.listaHospitais()).thenReturn(of(Hospital.builder().id(1l).build()));
+  @Test
+  public void retornaUmResultado_quandoEstaArmazenado() throws Exception {
+    when(this.hospitalService.listaHospitais()).thenReturn(of(Hospital.builder().id(1l).build()));
 
-        this.mockMvc.perform(get("/hospitais")).andDo(print()).andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON)).andExpect(jsonPath("[0].id").value(1));
-    }
+    this.mockMvc
+        .perform(get("/hospitais"))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("[0].id").value(1));
+  }
 
-    @Test
-    public void retornaHospitalPorId_quandoEstaArmazenado() throws Exception {
-        when(this.hospitalService.hospitalPorId(1l)).thenReturn(Hospital.builder().id(1l).build());
+  @Test
+  public void retornaHospitalPorId_quandoEstaArmazenado() throws Exception {
+    when(this.hospitalService.hospitalPorId(1l)).thenReturn(Hospital.builder().id(1l).build());
 
-        this.mockMvc.perform(get("/hospitais/1")).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("id").value(1));
-    }
+    this.mockMvc
+        .perform(get("/hospitais/1"))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("id").value(1));
+  }
 
-    @Test
-    public void retornaNenhumHospitalPorId_quandoNaoEstaArmazenado() throws Exception {
-        when(this.hospitalService.hospitalPorId(any())).thenReturn(null);
+  @Test
+  public void retornaNenhumHospitalPorId_quandoNaoEstaArmazenado() throws Exception {
+    when(this.hospitalService.hospitalPorId(any())).thenReturn(null);
 
-        this.mockMvc.perform(get("/hospitais/{id}", "1")).andDo(print()).andExpect(status().isNotFound());
-    }
+    this.mockMvc
+        .perform(get("/hospitais/{id}", "1"))
+        .andDo(print())
+        .andExpect(status().isNotFound());
+  }
 
-    @Test
-    public void criaNovoHospital() throws JsonProcessingException, Exception {
-        when(this.hospitalService.salvaHospital(any())).thenReturn(Hospital.builder().id(1l).build());
+  @Test
+  public void criaNovoHospital() throws JsonProcessingException, Exception {
+    when(this.hospitalService.salvaHospital(any())).thenReturn(Hospital.builder().id(1l).build());
 
-        this.mockMvc
-                .perform(post("/hospitais")
-                        .content(new ObjectMapper().writeValueAsString(Hospital.builder().nome("Hospital 1").build()))
-                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).accept(MediaType.APPLICATION_JSON))
-                .andDo(print()).andExpect(status().isCreated()).andExpect(jsonPath("$.id").value(1)).andReturn();
-    }
+    this.mockMvc
+        .perform(
+            post("/hospitais")
+                .content(
+                    new ObjectMapper()
+                        .writeValueAsString(Hospital.builder().nome("Hospital 1").build()))
+                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .accept(MediaType.APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.id").value(1))
+        .andReturn();
+  }
 
-    @Test
-    public void alteraNrDePacientes() throws JsonProcessingException, Exception {
-        when(this.hospitalService.hospitalPorId(any())).thenReturn(Hospital.builder().id(1l).build());
-        when(this.hospitalService.alterarNrDePacientes(any(),any())).thenReturn(Hospital.builder().id(1l).pacientes(100l).build());
+  @Test
+  public void alteraNrDePacientes() throws JsonProcessingException, Exception {
+    when(this.hospitalService.hospitalPorId(any())).thenReturn(Hospital.builder().id(1l).build());
+    when(this.hospitalService.alterarNrDePacientes(any(), any()))
+        .thenReturn(Hospital.builder().id(1l).pacientes(100l).build());
 
-        this.mockMvc.perform(put("/hospitais/1/pacientes")
-                .content(new ObjectMapper().writeValueAsString(PacientesDTO.builder().pacientes(100l).build()))
+    this.mockMvc
+        .perform(
+            put("/hospitais/1/pacientes")
+                .content(
+                    new ObjectMapper()
+                        .writeValueAsString(PacientesDTO.builder().pacientes(100l).build()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .characterEncoding("utf-8")
                 .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isOk()).andExpect(jsonPath("$.id").value(1));
-    }
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(1));
+  }
 
-    @Test
-    public void alteraCapacidade() throws JsonProcessingException, Exception {
-        when(this.hospitalService.hospitalPorId(any())).thenReturn(Hospital.builder().id(1l).build());
-        when(this.hospitalService.alterarCapacidade(any(),any())).thenReturn(Hospital.builder().id(1l).capacidade(100l).build());
+  @Test
+  public void alteraCapacidade() throws JsonProcessingException, Exception {
+    when(this.hospitalService.hospitalPorId(any())).thenReturn(Hospital.builder().id(1l).build());
+    when(this.hospitalService.alterarCapacidade(any(), any()))
+        .thenReturn(Hospital.builder().id(1l).capacidade(100l).build());
 
-        this.mockMvc.perform(put("/hospitais/1/capacidade")
-                .content(new ObjectMapper().writeValueAsString(CapacidadeDTO.builder().capacidade(100l).build()))
+    this.mockMvc
+        .perform(
+            put("/hospitais/1/capacidade")
+                .content(
+                    new ObjectMapper()
+                        .writeValueAsString(CapacidadeDTO.builder().capacidade(100l).build()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .characterEncoding("utf-8")
                 .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isOk()).andExpect(jsonPath("$.id").value(1));
-    }
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(1));
+  }
 }

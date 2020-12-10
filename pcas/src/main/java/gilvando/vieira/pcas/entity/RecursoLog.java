@@ -15,23 +15,19 @@ import java.time.LocalDateTime;
 @Entity
 public class RecursoLog {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  LocalDateTime dataHora;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "recebido_hospital")
-    private Hospital recebidoHospital;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "enviado_hospital")
-    private Hospital enviadoHospital;
+  @ManyToOne(fetch = FetchType.LAZY, optional = true)
+  @JoinColumn(name = "recebido_hospital")
+  private Hospital recebidoHospital;
 
+  @ManyToOne(fetch = FetchType.LAZY, optional = true)
+  @JoinColumn(name = "enviado_hospital")
+  private Hospital enviadoHospital;
 
-    @Embedded
-    private Recurso total;
-
-
-    LocalDateTime dataHora;
-
+  @Embedded private Recurso total;
 }

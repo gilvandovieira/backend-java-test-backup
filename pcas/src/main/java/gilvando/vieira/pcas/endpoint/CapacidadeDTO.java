@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CapacidadeDTO {
-    private Long capacidade;
+  private Long capacidade;
 }

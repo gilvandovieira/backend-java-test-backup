@@ -9,6 +9,7 @@ import java.util.List;
 @Repository
 public interface HospitalLogRepository extends CrudRepository<HospitalLog, Long> {
 
-    List<HospitalLog> findAll();
-    List<HospitalLog> findAllByHospital(Long hospital);
+  List<HospitalLog> findAll();
+
+  List<HospitalLog> findAllByHospital(Long hospital);
 }

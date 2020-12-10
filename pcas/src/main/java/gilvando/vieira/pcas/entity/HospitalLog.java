@@ -15,22 +15,20 @@ import java.time.LocalDateTime;
 @Builder
 public class HospitalLog {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "hospital_id")
-    private Hospital hospital;
+  @ManyToOne(fetch = FetchType.LAZY, optional = true)
+  @JoinColumn(name = "hospital_id")
+  private Hospital hospital;
 
-    private LocalDateTime dataHora;
+  private LocalDateTime dataHora;
 
-    @Builder.Default
-    private Long capacidade = 0l;
-    @Builder.Default
-    private Long pacientes = 0l;
+  @Builder.Default private Long capacidade = 0l;
+  @Builder.Default private Long pacientes = 0l;
 
-    public Double lotacao() {
-        return pacientes.doubleValue() / capacidade.doubleValue();
-    }
+  public Double lotacao() {
+    return pacientes.doubleValue() / capacidade.doubleValue();
+  }
 }

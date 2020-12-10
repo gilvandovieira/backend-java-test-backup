@@ -4,64 +4,68 @@ import gilvando.vieira.pcas.entity.Hospital;
 import gilvando.vieira.pcas.service.HospitalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.websocket.server.PathParam;
 import java.util.List;
 
 @RestController
 @RequestMapping(path = "/hospitais")
 public class HospitalController {
 
-    private final HospitalService hospitalService;
+  private final HospitalService hospitalService;
 
-    @Autowired
-    public HospitalController(HospitalService hospitalService) {
-        this.hospitalService = hospitalService;
+  @Autowired
+  public HospitalController(HospitalService hospitalService) {
+    this.hospitalService = hospitalService;
+  }
+
+  @GetMapping(produces = "application/json")
+  public List<Hospital> listaHospitais() {
+
+    return this.hospitalService.listaHospitais();
+  }
+
+  @GetMapping(path = "/{id}", produces = "application/json")
+  public Hospital retornaHospitalPorId(@PathVariable(name = "id") Long id) {
+
+    Hospital hospital = this.hospitalService.hospitalPorId(id);
+
+    if (hospital == null) {
+      throw new HospitalNaoEncontradoException();
     }
 
-    @GetMapping(produces = "application/json")
-    public List<Hospital> listaHospitais() {
+    return hospital;
+  }
 
-        return this.hospitalService.listaHospitais();
-    }
+  @PostMapping(produces = "application/json")
+  public ResponseEntity<Hospital> adicionaHospital(@RequestBody Hospital entity) {
+    Hospital hospital = this.hospitalService.salvaHospital(entity);
 
-    @GetMapping(path = "/{id}", produces = "application/json")
-    public Hospital retornaHospitalPorId(@PathVariable(name = "id") Long id) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(hospital);
+  }
 
-        Hospital hospital = this.hospitalService.hospitalPorId(id);
+  @PutMapping(
+      consumes = "application/json",
+      produces = "application/json",
+      path = "/{id}/pacientes")
+  public ResponseEntity<Hospital> alteraNrDePacientes(
+      @PathVariable(name = "id") Long id, @RequestBody(required = true) PacientesDTO pacientesDTO) {
 
-        if (hospital == null) {
-            throw new HospitalNaoEncontradoException();
-        }
+    Hospital hospital = this.hospitalService.alterarNrDePacientes(id, pacientesDTO.getPacientes());
 
-        return hospital;
-    }
+    return ResponseEntity.ok(hospital);
+  }
 
-    @PostMapping(produces = "application/json")
-    public ResponseEntity<Hospital> adicionaHospital(@RequestBody Hospital entity) {
-        Hospital hospital = this.hospitalService.salvaHospital(entity);
+  @PutMapping(
+      consumes = "application/json",
+      produces = "application/json",
+      path = "/{id}/capacidade")
+  public ResponseEntity<Hospital> alteraCapacidade(
+      @PathVariable(name = "id") Long id, @RequestBody CapacidadeDTO capacidadeDTO) {
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(hospital);
+    Hospital hospital = this.hospitalService.alterarCapacidade(id, capacidadeDTO.getCapacidade());
 
-    }
-
-    @PutMapping(consumes = "application/json", produces = "application/json", path = "/{id}/pacientes")
-    public ResponseEntity<Hospital> alteraNrDePacientes(@PathVariable(name = "id") Long id, @RequestBody(required = true) PacientesDTO pacientesDTO) {
-
-        Hospital hospital = this.hospitalService.alterarNrDePacientes(id, pacientesDTO.getPacientes());
-
-        return ResponseEntity.ok(hospital);
-    }
-
-    @PutMapping(consumes = "application/json", produces = "application/json", path = "/{id}/capacidade")
-    public ResponseEntity<Hospital> alteraCapacidade(@PathVariable(name = "id") Long id, @RequestBody CapacidadeDTO capacidadeDTO){
-
-        Hospital hospital = this.hospitalService.alterarCapacidade(id,capacidadeDTO.getCapacidade());
-
-        return ResponseEntity.ok(hospital);
-    }
-
+    return ResponseEntity.ok(hospital);
+  }
 }

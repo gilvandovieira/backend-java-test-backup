@@ -1,74 +1,96 @@
 package gilvando.vieira.pcas;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.time.LocalDateTime;
-import java.util.List;
-
+import gilvando.vieira.pcas.entity.Hospital;
 import gilvando.vieira.pcas.entity.HospitalLog;
+import gilvando.vieira.pcas.entity.Recurso;
 import gilvando.vieira.pcas.repository.HospitalLogRepository;
+import gilvando.vieira.pcas.repository.HospitalRepository;
 import org.junit.jupiter.api.Test;
-
-//import org.junit.Test;
-//import org.junit.runner.RunWith;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
-import gilvando.vieira.pcas.entity.Hospital;
-import gilvando.vieira.pcas.entity.Recurso;
-import gilvando.vieira.pcas.repository.HospitalRepository;
+import java.time.LocalDateTime;
+import java.util.List;
 
-//@RunWith(SpringRunner.class)
+import static org.assertj.core.api.Assertions.assertThat;
+
+// @RunWith(SpringRunner.class)
 @DataJpaTest
 public class RepositoryTests {
 
-    @Autowired
-    private HospitalRepository hospitalRepository;
+  @Autowired TestEntityManager testEntityManager;
+  @Autowired private HospitalRepository hospitalRepository;
+  @Autowired private HospitalLogRepository hospitalLogRepository;
 
-    @Autowired
-    private HospitalLogRepository hospitalLogRepository;
+  @Test
+  public void dadosEstaoPersistindo() {
+    Hospital hospitalSalvo =
+        testEntityManager.persistAndFlush(
+            Hospital.builder()
+                .nome("Hospital Guadalupe")
+                .endereco("Av Ruy Carneiro, 1")
+                .cnpj("00000000/0000")
+                .latitude(-35.0)
+                .longitude(-25.0)
+                .capacidade(1000l)
+                .pacientes(100l)
+                .recursos(
+                    Recurso.builder()
+                        .ambulancia(10l)
+                        .enfermeiro(30l)
+                        .medico(20l)
+                        .respirador(12l)
+                        .tomografo(2l)
+                        .build())
+                .build());
+    Hospital hospital = this.hospitalRepository.findByNome("Hospital Guadalupe");
 
-    @Autowired
-    TestEntityManager testEntityManager;
+    assertThat(hospital.getCnpj()).isEqualTo(hospitalSalvo.getCnpj());
+    assertThat(hospital.getCapacidade()).isEqualTo(1000l);
+  }
 
-    @Test
-    public void dadosEstaoPersistindo() {
-        Hospital hospitalSalvo = testEntityManager.persistAndFlush(
-                Hospital.builder().nome("Hospital Guadalupe").endereco("Av Ruy Carneiro, 1").cnpj("00000000/0000")
-                        .latitude(-35.0).longitude(-25.0).capacidade(1000l).pacientes(100l).recursos(Recurso.builder()
-                                .ambulancia(10l).enfermeiro(30l).medico(20l).respirador(12l).tomografo(2l).build())
-                        .build());
-        Hospital hospital = this.hospitalRepository.findByNome("Hospital Guadalupe");
+  @Test
+  public void retornaListaDeHospitaisComMaisDeNoventaPorCentoDeOcupacao() {
+    Hospital hospitalSalvo =
+        testEntityManager.persistAndFlush(
+            Hospital.builder()
+                .nome("Hospital Guadalupe")
+                .endereco("Av Ruy Carneiro, 1")
+                .cnpj("00000000/0000")
+                .latitude(-35.0)
+                .longitude(-25.0)
+                .capacidade(1000l)
+                .pacientes(900l)
+                .recursos(
+                    Recurso.builder()
+                        .ambulancia(10l)
+                        .enfermeiro(30l)
+                        .medico(20l)
+                        .respirador(12l)
+                        .tomografo(2l)
+                        .build())
+                .build());
+    List<Hospital> hospitais =
+        this.hospitalRepository.hospitaisComCapacidadeAcimaDeNoventaPorCento();
 
-        assertThat(hospital.getCnpj()).isEqualTo(hospitalSalvo.getCnpj());
-        assertThat(hospital.getCapacidade()).isEqualTo(1000l);
+    assertThat(hospitais.size()).isEqualTo(1);
+    assertThat(hospitais.get(0).getNome()).isEqualTo("Hospital Guadalupe");
+  }
 
-    }
+  @Test
+  public void retornaTodosLogs() {
+    Hospital hospital = testEntityManager.persistAndFlush(Hospital.builder().build());
+    HospitalLog hospitalLog =
+        testEntityManager.persistAndFlush(
+            HospitalLog.builder()
+                .dataHora(LocalDateTime.now())
+                .hospital(Hospital.builder().id(1l).build())
+                .build());
 
-    @Test
-    public void retornaListaDeHospitaisComMaisDeNoventaPorCentoDeOcupacao() {
-        Hospital hospitalSalvo = testEntityManager.persistAndFlush(
-                Hospital.builder().nome("Hospital Guadalupe").endereco("Av Ruy Carneiro, 1").cnpj("00000000/0000")
-                        .latitude(-35.0).longitude(-25.0).capacidade(1000l).pacientes(900l).recursos(Recurso.builder()
-                                .ambulancia(10l).enfermeiro(30l).medico(20l).respirador(12l).tomografo(2l).build())
-                        .build());
-        List<Hospital> hospitais = this.hospitalRepository.hospitaisComCapacidadeAcimaDeNoventaPorCento();
+    List<HospitalLog> hospitalLogs = hospitalLogRepository.findAll();
 
-        assertThat(hospitais.size()).isEqualTo(1);
-        assertThat(hospitais.get(0).getNome()).isEqualTo("Hospital Guadalupe");
-    }
-
-    @Test
-    public void retornaTodosLogs(){
-        Hospital hospital = testEntityManager.persistAndFlush(Hospital.builder().build());
-        HospitalLog hospitalLog = testEntityManager.persistAndFlush(HospitalLog.builder().dataHora(LocalDateTime.now()).hospital(Hospital.builder().id(1l).build()).build());
-
-        List<HospitalLog> hospitalLogs = hospitalLogRepository.findAll();
-
-        assertThat(hospitalLogs.size()).isEqualTo(1);
-        assertThat(hospitalLogs.get(0)).isEqualTo(hospitalLog);
-    }
-
+    assertThat(hospitalLogs.size()).isEqualTo(1);
+    assertThat(hospitalLogs.get(0)).isEqualTo(hospitalLog);
+  }
 }

@@ -12,50 +12,61 @@ import java.util.Map;
 @RequestMapping(path = "/gestao")
 public class GestorController {
 
-    private HospitalService hospitalService;
+  private HospitalService hospitalService;
 
-    @Autowired
-    public GestorController(HospitalService hospitalService) {
-        this.hospitalService = hospitalService;
+  @Autowired
+  public GestorController(HospitalService hospitalService) {
+    this.hospitalService = hospitalService;
+  }
+
+  @PostMapping(
+      value = "/transferencia",
+      consumes = "application/json",
+      produces = "application/json")
+  public ResponseEntity realizaTranferencia(@RequestBody TransferenciaDTO entity) {
+    boolean verdade =
+        this.hospitalService.realizaTransacaoEntreHospitais(
+            entity.hospitalRecebe, entity.hospitalEnvia, entity.recursoRecebe, entity.recursoEnvia);
+
+    if (verdade) {
+      return ResponseEntity.ok().build();
     }
 
-    @PostMapping(value = "/transferencia", consumes = "application/json", produces = "application/json")
-    public ResponseEntity realizaTranferencia(@RequestBody TransferenciaDTO entity) {
-        boolean verdade = this.hospitalService.realizaTransacaoEntreHospitais(entity.hospitalRecebe,
-                entity.hospitalEnvia, entity.recursoRecebe, entity.recursoEnvia);
+    return ResponseEntity.badRequest().body(false);
+  }
 
-        if (verdade) {
-            return ResponseEntity.ok().build();
-        }
+  @GetMapping(produces = "application/json")
+  public ResponseEntity geraRelatorios() {
+    Map<String, Object> relatorio = new HashMap<>();
 
-        return ResponseEntity.badRequest().body(false);
+    Double porcentagem_hospitais_com_mais_de_noventa_porcento_de_ocupacao =
+        hospitalService.porcentagemDeHospitaisComOcupacaoMaiorQue90Porcento();
+    if (!porcentagem_hospitais_com_mais_de_noventa_porcento_de_ocupacao.isNaN())
+      relatorio.put(
+          "porcentagem_hospitais_com_mais_de_noventa_porcento_de_ocupacao",
+          porcentagem_hospitais_com_mais_de_noventa_porcento_de_ocupacao);
+    Double porcentagem_hospitais_com_menos_de_noventa_porcento_de_ocupacao =
+        hospitalService.porcentagemDeHospitaisComOcupacaoMenorQue90Porcento();
+    if (!porcentagem_hospitais_com_menos_de_noventa_porcento_de_ocupacao.isNaN())
+      relatorio.put(
+          "porcentagem_hospitais_com_menos_de_noventa_porcento_de_ocupacao",
+          porcentagem_hospitais_com_menos_de_noventa_porcento_de_ocupacao);
+
+    try {
+      relatorio.put("medias", hospitalService.mediasDeRecursos());
+    } catch (RuntimeException runtimeException) {
+      relatorio.clear();
+      relatorio.put("mensagem", runtimeException.getMessage());
+      return ResponseEntity.badRequest().body(relatorio);
     }
 
-    @GetMapping(produces = "application/json")
-    public ResponseEntity geraRelatorios() {
-        Map<String, Object> relatorio = new HashMap<>();
+    relatorio.put("historico_de_negociacao", hospitalService.listaLogRecurso());
 
-        Double porcentagem_hospitais_com_mais_de_noventa_porcento_de_ocupacao = hospitalService.porcentagemDeHospitaisComOcupacaoMaiorQue90Porcento();
-        if (!porcentagem_hospitais_com_mais_de_noventa_porcento_de_ocupacao.isNaN())
-            relatorio.put("porcentagem_hospitais_com_mais_de_noventa_porcento_de_ocupacao", porcentagem_hospitais_com_mais_de_noventa_porcento_de_ocupacao);
-        Double porcentagem_hospitais_com_menos_de_noventa_porcento_de_ocupacao = hospitalService.porcentagemDeHospitaisComOcupacaoMenorQue90Porcento();
-        if (!porcentagem_hospitais_com_menos_de_noventa_porcento_de_ocupacao.isNaN())
-            relatorio.put("porcentagem_hospitais_com_menos_de_noventa_porcento_de_ocupacao", porcentagem_hospitais_com_menos_de_noventa_porcento_de_ocupacao);
+    relatorio.put(
+        "hospital_com_super_lotacao_a_mais_tempo", hospitalService.superLotacaoAMaisTempo());
+    relatorio.put(
+        "hospital_abaixo_da_super_lotacao_a_mais_tempo", hospitalService.baixaLotacaoAMaisTempo());
 
-        try {
-            relatorio.put("medias", hospitalService.mediasDeRecursos());
-        } catch (RuntimeException runtimeException) {
-            relatorio.clear();
-            relatorio.put("mensagem", runtimeException.getMessage());
-            return ResponseEntity.badRequest().body(relatorio);
-        }
-
-        relatorio.put("historico_de_negociacao", hospitalService.listaLogRecurso());
-
-        relatorio.put("hospital_com_super_lotacao_a_mais_tempo", hospitalService.superLotacaoAMaisTempo());
-        relatorio.put("hospital_abaixo_da_super_lotacao_a_mais_tempo", hospitalService.baixaLotacaoAMaisTempo());
-
-        return ResponseEntity.ok(relatorio);
-    }
-
+    return ResponseEntity.ok(relatorio);
+  }
 }

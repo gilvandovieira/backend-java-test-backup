@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PacientesDTO {
-    private Long pacientes;
+  private Long pacientes;
 }
