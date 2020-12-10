@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -111,7 +112,7 @@ public class GestorServiceTest {
   public void determinaSeUmHospitalEstaAMaisTempoComSuperLotacao() {
     given(hospitalLogRepository.findAll())
         .willReturn(
-            List.of(
+            Arrays.asList(
                 HospitalLog.builder()
                     .capacidade(100l)
                     .pacientes(90l)
@@ -137,7 +138,7 @@ public class GestorServiceTest {
   public void determinaSeUmHospitalEstaAMaisTempoComSuperLotacao_2() {
     given(hospitalLogRepository.findAll())
         .willReturn(
-            List.of(
+            Arrays.asList(
                 HospitalLog.builder()
                     .capacidade(100l)
                     .pacientes(90l)
@@ -175,7 +176,7 @@ public class GestorServiceTest {
   public void determinaSeUmHospitalEstaAMaisTempoComBaixaLotacao() {
     given(hospitalLogRepository.findAll())
         .willReturn(
-            List.of(
+            Arrays.asList(
                 HospitalLog.builder()
                     .capacidade(100l)
                     .pacientes(90l)
@@ -201,7 +202,7 @@ public class GestorServiceTest {
   public void determinaSeUmHospitalEstaAMaisTempoComBaixaLotacao_2() {
     given(hospitalLogRepository.findAll())
         .willReturn(
-            List.of(
+            Arrays.asList(
                 HospitalLog.builder()
                     .capacidade(100l)
                     .pacientes(90l)

@@ -17,9 +17,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 
-import static java.util.List.of;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -54,7 +54,8 @@ public class HospitalControllerTest {
 
   @Test
   public void retornaUmResultado_quandoEstaArmazenado() throws Exception {
-    when(this.hospitalService.listaHospitais()).thenReturn(of(Hospital.builder().id(1l).build()));
+    when(this.hospitalService.listaHospitais())
+        .thenReturn(Arrays.asList(Hospital.builder().id(1l).build()));
 
     this.mockMvc
         .perform(get("/hospitais"))
@@ -95,7 +96,7 @@ public class HospitalControllerTest {
                 .content(
                     new ObjectMapper()
                         .writeValueAsString(Hospital.builder().nome("Hospital 1").build()))
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isCreated())

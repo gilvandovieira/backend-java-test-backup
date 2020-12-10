@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -116,7 +117,7 @@ public class HospitalServiceTest {
   public void porcentagemDeHospitaisComMaisDe90Porcento() {
     given(hospitalRepository.findAll())
         .willReturn(
-            List.of(
+            Arrays.asList(
                 Hospital.builder().pacientes(99l).capacidade(100l).build(),
                 Hospital.builder().capacidade(10l).pacientes(8l).build()));
 
@@ -129,7 +130,7 @@ public class HospitalServiceTest {
   public void porcentagemDeHospitaisComMenosDe90Porcento() {
     given(hospitalRepository.findAll())
         .willReturn(
-            List.of(
+            Arrays.asList(
                 Hospital.builder().pacientes(99l).capacidade(100l).build(),
                 Hospital.builder().capacidade(10l).pacientes(8l).build()));
 
@@ -142,7 +143,7 @@ public class HospitalServiceTest {
   public void mediaDeEquipamentos() {
     given(hospitalRepository.findAll())
         .willReturn(
-            List.of(
+            Arrays.asList(
                 Hospital.builder().recursos(Recurso.builder().ambulancia(10l).build()).build(),
                 Hospital.builder().recursos(Recurso.builder().ambulancia(20l).build()).build()));
 
@@ -158,7 +159,7 @@ public class HospitalServiceTest {
     given(hospitalRepository.findById(anyLong())).willReturn(Optional.of(h1));
     given(hospitalLogRepository.save(any())).willReturn(HospitalLog.builder().hospital(h1).build());
     HospitalLog hl1 = HospitalLog.builder().id(1l).hospital(h1).capacidade(100l).build();
-    given(hospitalLogRepository.findAll()).willReturn(List.of(hl1));
+    given(hospitalLogRepository.findAll()).willReturn(Arrays.asList(hl1));
 
     Hospital hospital = this.hospitalService.alterarCapacidade(1l, 100l);
 
