@@ -63,3 +63,69 @@ Você irá desenvolver uma **API RESTFul** (a ideia é que facilmente outros sis
 5. Sua API deve estar minimamente coberta por testes (Unitários e/ou integração).
 6. Da descrição acima você pode escrever uma solução básica ou adicionar requisitos não descritos. Use seu tempo com sabedoria; Uma solução ótima e definitiva pode levar muito tempo para ser efetiva, então você deve trazer a melhor solução possível, que leve o mínimo de tempo, mas que ainda seja capaz de demonstrar suas habilidades.
 7. Comente qualquer dúvida e cada decisão tomada.
+
+---
+
+# Documentação
+
+1. Verifique a sua versão do java e do compilador do java abrindo o terminal/command prompt e digitando **java -version** e **javac -version**, o resultado deve ser algo como:
+
+   ````
+   java version "1.8.0_271"
+   Java(TM) SE Runtime Environment (build 1.8.0_271-b09)
+   Java HotSpot(TM) 64-Bit Server VM (build 25.271-b09, mixed mode)
+   ````
+
+   2. Faça download do código fonte em https://gitlab.com/gilvandolucasvieira/backend-java-test/-/archive/v0.2.1/backend-java-test-v0.2.1.zip
+
+   3. Abra o diretório pcas no terminal e digite:
+
+      ```
+      mvnw install package
+      ```
+
+   4.  Execute o comando **java -jar .\target\pcas-0.2.jar**
+
+   5. Abra o navegador no link http://localhost:8080/swagger-ui.html
+
+   6. O Swagger é uma documentação iterativa, lá você pode testar os endpoints da aplicação e ver também como mandar requisições pro projeto.
+
+      
+
+
+# Comentários
+
+- os relatórios 4 e 5 foram os mais difíceis, tive que pesquisar muito, eu estava tendo dificuldades com a API Java na posição de tratá-lá como a api do javascript, eu estou acostumado com uma API mais flexível de map-reduce, demorei um pouco para entender que não são similares as funções entre as linguagens, apesar de usarem mesma nomenclatura.
+
+- Durante o desenvolvimento e testes básicos o bidirecionamento do mapeamento das classes não foi um problema, quando eu adicionei o Swagger para testar "em modo de produção", foi que eu percebi o problema do parser de JSON, estava dando StackOverflow constatemente, por isso removi a bidirecionalidade das entidades.
+
+  
+
+# Nova funcionalidade proposta
+
+Dada a tabela:
+
+| Item         | Pontos   |
+| ------------ | -------- |
+| 1 Médico     | 3 pontos |
+| 1 Enfermeiro | 3 pontos |
+| 1 Respirador | 5 pontos |
+| 1 Tomógrafo  | 12 ponto |
+| 1 Ambulância | 10 ponto |
+
+Não considere a pontuação como definitiva, os pontos podem mudar, e os recursos podem mudar de acordo com a evolução da pandemia.
+
+````
+ ----------          ---------
+| Hospital |-------<| Recurso |
+ ----------          ---------
+ 
+  ---------
+ | Recurso |
+  ---------
+ | + Id    |
+ | + Nome  |
+ | + Ponto |
+  ---------
+````
+
