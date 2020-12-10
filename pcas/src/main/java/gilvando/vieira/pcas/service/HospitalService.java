@@ -9,14 +9,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class HospitalService {
 
-    private HospitalRepository hospitalRepository;
-    private HospitalLogRepository hospitalLogRepository;
-    private RecursoLogRepository recursoLogRepository;
+    private final HospitalRepository hospitalRepository;
+    private final HospitalLogRepository hospitalLogRepository;
+    private final RecursoLogRepository recursoLogRepository;
 
     @Autowired
     public HospitalService(HospitalRepository hospitalRepository, HospitalLogRepository hospitalLogRepository, RecursoLogRepository recursoLogRepository) {
@@ -187,5 +189,30 @@ public class HospitalService {
         return medias;
     }
 
+    public Hospital superLotacaoAMaisTempo() {
+        List<HospitalLog> hospitalLogs = this.listaLogHospital();
+
+        Map<Long, Double> mediaLotacaoPorHospital = hospitalLogs.stream()
+                .filter(hospitalLog -> hospitalLog.lotacao() >= 0.9)
+                .collect(
+                        Collectors
+                                .groupingBy(hospitalLog -> hospitalLog.getHospital().getId(),
+                                        Collectors.averagingDouble(value -> value.getDataHora().toEpochSecond(ZoneOffset.UTC))));
+
+        return this.hospitalPorId(mediaLotacaoPorHospital.entrySet().stream().max(Comparator.comparing(Map.Entry::getValue)).get().getKey());
+    }
+
+    public Hospital baixaLotacaoAMaisTempo() {
+        List<HospitalLog> hospitalLogs = this.listaLogHospital();
+
+        Map<Long, Double> mediaLotacaoPorHospital = hospitalLogs.stream()
+                .filter(hospitalLog -> hospitalLog.lotacao() < 0.9)
+                .collect(
+                        Collectors
+                                .groupingBy(hospitalLog -> hospitalLog.getHospital().getId(),
+                                        Collectors.averagingDouble(value -> value.getDataHora().toEpochSecond(ZoneOffset.UTC))));
+
+        return this.hospitalPorId(mediaLotacaoPorHospital.entrySet().stream().max(Comparator.comparing(Map.Entry::getValue)).get().getKey());
+    }
 
 }

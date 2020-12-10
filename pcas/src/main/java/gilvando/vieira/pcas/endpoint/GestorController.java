@@ -52,6 +52,9 @@ public class GestorController {
 
         relatorio.put("historico_de_negociacao", hospitalService.listaLogRecurso());
 
+        relatorio.put("hospital_com_super_lotacao_a_mais_tempo", hospitalService.superLotacaoAMaisTempo());
+        relatorio.put("hospital_abaixo_da_super_lotacao_a_mais_tempo", hospitalService.baixaLotacaoAMaisTempo());
+
         return ResponseEntity.ok(relatorio);
     }
 

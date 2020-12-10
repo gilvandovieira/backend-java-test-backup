@@ -20,11 +20,17 @@ public class HospitalLog {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "hospital_id" )
+    @JoinColumn(name = "hospital_id")
     private Hospital hospital;
 
     private LocalDateTime dataHora;
 
-    private Long capacidade;
-    private Long pacientes;
+    @Builder.Default
+    private Long capacidade = 0l;
+    @Builder.Default
+    private Long pacientes = 0l;
+
+    public Double lotacao() {
+        return pacientes.doubleValue() / capacidade.doubleValue();
+    }
 }
